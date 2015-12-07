@@ -4,6 +4,7 @@
 set sel [atomselect top all]
 set cen [measure center $sel]
 set mm [measure minmax $sel]
+puts $mm
 set vmin [lindex $mm 0]
 set vmax [lindex $mm 1]
 set vdif [vecsub $vmax $vmin]
