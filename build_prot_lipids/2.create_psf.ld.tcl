@@ -9,13 +9,13 @@ topology /Users/mocohen/Work/ccta/toppar/Triolein.top
 
 segment PROT { pdb prot_moved.pdb }
 segment M1 { 
-	pdb ../../bilayer.pdbs/popc.pdb 
+	pdb ../../droplet.pdbs/popc.pdb 
 }
 segment M2 { 
-	pdb ../../bilayer.pdbs/dope.pdb
+	pdb ../../droplet.pdbs/dope.pdb
 }
 segment M3 { 
-	pdb ../../bilayer.pdbs/sapi.pdb
+	pdb ../../droplet.pdbs/sapi.pdb
 }
 segment O1 { 
         pdb ../../droplet.pdbs/trio.pdb 
@@ -25,9 +25,9 @@ segment O2 {
 }
 
 coordpdb prot_moved.pdb PROT
-coordpdb ../../bilayer.pdbs/popc.pdb M1
-coordpdb ../../bilayer.pdbs/dope.pdb M2
-coordpdb ../../bilayer.pdbs/sapi.pdb M3
+coordpdb ../../droplet.pdbs/popc.pdb M1
+coordpdb ../../droplet.pdbs/dope.pdb M2
+coordpdb ../../droplet.pdbs/sapi.pdb M3
 coordpdb ../../droplet.pdbs/trio.pdb O1
 coordpdb ../../droplet.pdbs/clol.pdb O2
 
