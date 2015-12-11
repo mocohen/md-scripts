@@ -1,6 +1,6 @@
 #solvate
 package require solvate
-solvate {memb_prot.psf} {memb_prot.pdb} -o solvate -minmax {{-55.962 -55.962 -55.000} {55.962 55.962 85.0}}
+solvate {memb_prot.psf} {memb_prot.pdb} -o solvate -minmax {{-52.024 -52.024 -55.000} {52.024 52.024 85.0}}
 
 #remove bad waters
 
