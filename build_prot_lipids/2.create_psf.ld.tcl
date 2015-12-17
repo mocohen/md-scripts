@@ -6,6 +6,7 @@ topology /Users/mocohen/Work/ccta/POPC-DOPE-SAPI/protein_sims/alps/droplet.40/to
 topology /Users/mocohen/Work/ccta/POPC-DOPE-SAPI/protein_sims/alps/droplet.40/toppar_all36_lipid_inositol.str
 topology /Users/mocohen/Work/ccta/toppar/CholesterylOleate.top
 topology /Users/mocohen/Work/ccta/toppar/Triolein.top
+alias residue HIS HSE
 
 segment PROT { pdb prot_moved.pdb }
 segment M1 { 

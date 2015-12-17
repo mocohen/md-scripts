@@ -16,14 +16,16 @@ cp /Users/mocohen/GitHub/md-scripts/build_prot_lipids/restraints/*.itp ./output/
 python ~/GitHub/md-scripts/build_prot_lipids/restraints/prot_restraints.py -i output/toppar/PROT.itp -o output/restraints/PROT_rest.itp
 
 
-sed -i '' -e '$ d' output/toppar/CLOL.itp 
-sed -i '' -e '$ d' output/toppar/CLOL.itp
-sed -i '' -e '$ d' output/toppar/CLOL.itp
+#sed -i '' -e '$ d' output/toppar/CLOL.itp 
+#sed -i '' -e '$ d' output/toppar/CLOL.itp
+#sed -i '' -e '$ d' output/toppar/CLOL.itp
 
 sed -i '' -e '$ d' output/toppar/ION.itp 
 sed -i '' -e '$ d' output/toppar/ION.itp 
 sed -i '' -e '$ d' output/toppar/ION.itp 
 
-sed -i '' -e '$ d' output/toppar/TRIO.itp 
-sed -i '' -e '$ d' output/toppar/TRIO.itp 
-sed -i '' -e '$ d' output/toppar/TRIO.itp 
+#sed -i '' -e '$ d' output/toppar/TRIO.itp 
+#sed -i '' -e '$ d' output/toppar/TRIO.itp 
+#sed -i '' -e '$ d' output/toppar/TRIO.itp 
+
+gmx_mpi_d make_ndx -f final.ionized.pdb -o output/index.ndx < /Users/mocohen/GitHub/md-scripts/build_prot_lipids/make_index.ld.dat
