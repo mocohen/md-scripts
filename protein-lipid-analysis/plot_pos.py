@@ -107,7 +107,10 @@ axd = axs.ravel()
 for i in range(len(resNames)):
 	resname = resNames[i]
 	axd[i].plot([0,1000], [0.0, 0.0], 'k', timeVals[0::skipNum], resPosZ[i][0::skipNum], restypes[resname])
-	axd[i].set_title(resname + str(i+1))
+	if 'p2' in prot:
+		axd[i].set_title(resname + str(i+27))
+	else:
+		axd[i].set_title(resname + str(i+1))
 	#axd[i].set_xlabel('Time (xx)')
 	#axd[i].set_ylabel('Distance to Membrane ($\AA$)')
 	i += 1
