@@ -17,15 +17,6 @@ for opt, arg in opts:
     elif opt == '-r':
     	runNumber = arg
 
-resNumOffset = 0
-
-if 'alps' in prot:
-	resNumOffset = 1
-
-if 'M' in prot:
-	resNumOffset = 1
-if 'p2' in prot:
-	resNumOffset = 27
 
 dateStringFormat = "%Y-%m-%d %H:%M:%S.000"
 
@@ -35,23 +26,6 @@ if os.path.isfile(dbFile):
 	
 conn= sqlite3.connect(dbFile)
 c = conn.cursor()
-c.execute('''CREATE TABLE IF NOT EXISTS Systems 
-			(key 				INTEGER PRIMARY KEY,
-			membraneType 		TEXT,
-			lipidType			TEXT,
-			lipidComposition 	TEXT,
-			protein				TEXT,
-			runNumber			INTEGER)''')
-
-c.execute('''CREATE TABLE IF NOT EXISTS ProteinPositions 
-			(key 		INTEGER PRIMARY KEY,
-			systemID   	INTEGER,
-			timestep	real,
-			distance 	real,
-			resNum		INTEGER)''')
-
-conn.commit()
-
 
 
 
@@ -73,6 +47,14 @@ c.execute('''SELECT key FROM Systems where membraneType=? and protein=?
 
 
 key = c.fetchone()[0]
+
+residueDict = []
+for row in c.execute('SELECT key, resNum FROM Residues WHERE protein=? ORDER BY resNum', prot):
+	residueDict.append[row[0]]
+
+if(len(dict) < 1):
+	raise NameError('The protein name you selected with -p is not in the database. Please chose a different protein')
+
 
 resPosDB = []
 
@@ -100,10 +82,10 @@ for i in range(len(dat)):
 		# switch to angs from gromacs units (nm)
 		pos = 10*sign*dat[i][index]
 		resPosZ[j][i] = pos
-		resPosDB.append((key, timeFrame, pos, j+resNumOffset ))
+		resPosDB.append((key, timeFrame, pos, residueDict[j]))
 
 
-c.executemany(''' INSERT INTO ProteinPositions (systemID, timestep, distance, resNum) VALUES (?,?,?,?)''',
+c.executemany(''' INSERT INTO ProteinPositions (systemID, timestep, distance, resKey) VALUES (?,?,?,?)''',
 					resPosDB)	
 conn.commit()
 
