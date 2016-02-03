@@ -1,4 +1,6 @@
 import sys, getopt, os, errno, re, string
+import numpy as np
+
 from datetime import datetime, tzinfo
 import sqlite3
 
@@ -15,7 +17,15 @@ for opt, arg in opts:
     elif opt == '-r':
     	runNumber = arg
 
+resNumOffset = 0
 
+if 'alps' in prot:
+	resNumOffset = 1
+
+if 'M' in prot:
+	resNumOffset = 1
+if 'p2' in prot:
+	resNumOffset = 27
 
 dateStringFormat = "%Y-%m-%d %H:%M:%S.000"
 
@@ -33,12 +43,12 @@ c.execute('''CREATE TABLE IF NOT EXISTS Systems
 			protein				TEXT,
 			runNumber			INTEGER)''')
 
-c.execute('''CREATE TABLE IF NOT EXISTS proteinPositions 
+c.execute('''CREATE TABLE IF NOT EXISTS ProteinPositions 
 			(key 		INTEGER PRIMARY KEY,
 			systemID   	INTEGER,
 			timestep	real,
 			distance 	real,
-			resNum		real)''')
+			resNum		INTEGER)''')
 
 conn.commit()
 
@@ -55,20 +65,22 @@ resPosZ = np.zeros((numRes,len(dat)))
 
 systemInfo = (membraneType, "POPC:DOPE:SAPI", "65:27:8", prot, runNumber)
 
-c.execute('INSERT INTO Systems (membraneType, lipidType, lipidComposition, protein, runNumber) VALUES (?,?,?,?,?)', systemInfo)
+c.execute('''INSERT INTO Systems (membraneType, lipidType, lipidComposition, protein, runNumber) 
+				VALUES (?,?,?,?,?)''', systemInfo)
 
-c.execute('SELECT key FROM Systems where membraneType=? and protein=? and runNumber=?', (membraneType,  prot, runNumber))
+c.execute('''SELECT key FROM Systems where membraneType=? and protein=?
+			 and runNumber=?''', (membraneType,  prot, runNumber))
 
-print c.fetchone()
 
-exit()
+key = c.fetchone()[0]
 
-c.executemany('INSERT INTO Users (name, machine, date, usage) VALUES (?,?,?,?)', userInfo)
+resPosDB = []
 
 for i in range(len(dat)):
 	#First get time at frame
-	timeVals[i] = dat[i][0] / 1000.0
-	
+	timeFrame = dat[i][0] / 1000.0
+	timeVals[i] = timeFrame
+	print timeFrame	
 	first = False
 	#check if first closer
 	if(-1.0*dat[i][3] < dat[i][6]):
@@ -85,46 +97,15 @@ for i in range(len(dat)):
 		else:
 			index = indexB
 			sign = 1.0
-		# switch to angs from gromacs units (nm)	
-		resPosZ[j][i] = 10*sign*dat[i][index]
-# 		if j == 0 and i % 1000 == 0:
-# 	
+		# switch to angs from gromacs units (nm)
+		pos = 10*sign*dat[i][index]
+		resPosZ[j][i] = pos
+		resPosDB.append((key, timeFrame, pos, j+resNumOffset ))
 
 
-for line in input:
-	#print line
-	
-	# Check if beginning of a machine
-	if 'Resource' in line:
-		currentMachine = -1
-		
-		# loop through list of machines to find current machine
-		i = 0
-		for machine in machines:
-			if machine in line:
-				currentMachine = i
-				isFirst = True
-			i += 1
-	
-	# All User information contains SU in line
-	if currentMachine >= 0 and 'SU' in line:
-		split = line.strip().split()
-		
-		# 0      1      2      3   4          5   6          7
-		# lName, fName, Alloc, SU, Remaining, SU, userUsage, SU
-		
-		
-		#Check to make sure current year's allocation
-		if split[2] == initial[currentMachine]:
-			userInfo.append(( "%s %s" % (split[1], split[0]), machines[currentMachine], dateString, int(split[6])))
-			
-			if isFirst == True:
-				isFirst = False
-				totalRemaining += int(split[4])
-				machineInfo.append((machines[currentMachine], dateString, int(split[4])))
+c.executemany(''' INSERT INTO ProteinPositions (systemID, timestep, distance, resNum) VALUES (?,?,?,?)''',
+					resPosDB)	
+conn.commit()
 
-machineInfo.append((machines[5], dateString, totalRemaining))
-#print machineInfo
-
-c.executemany('INSERT INTO Machines (machine, date, remainingSU) VALUES (?,?,?)', machineInfo)
-c.executemany('INSERT INTO Users (name, machine, date, usage) VALUES (?,?,?,?)', userInfo)
+conn.close()
+exit()
