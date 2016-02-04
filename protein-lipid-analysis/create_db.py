@@ -64,6 +64,9 @@ m_prot = ('HIS', 'LEU', 'GLN', 'GLU', 'ARG', 'VAL', 'ASP', 'LYS', 'VAL', 'LYS', 
 
 p2_prot = ('VAL', 'GLU', 'GLU', 'LYS', 'SER', 'ILE', 'ASP', 'LEU', 'ILE', 'GLN', 'LYS', 'TRP', 'GLU', 'GLU', 
 		   'LYS', 'SER', 'ARG', 'GLU', 'PHE', 'ILE', 'GLY', 'SER', 'PHE', 'LEU', 'GLU', 'MET', 'PHE', 'GLY' )	
+
+p1_prot = ('HIS', 'LEU', 'GLN', 'GLU', 'ARG', 'VAL', 'ASP', 'LYS', 'VAL', 'LYS', 'LYS', 'LYS', 'VAL',
+		'LYS', 'ASP', 'VAL', 'GLU', 'GLU', 'LYS', 'SER', 'LYS', 'GLU', 'PHE', 'VAL', 'GLN', 'LYS', 'VAL')		   
 		   
 
 ala = (1, 	'alanine', 		'A', 'ALA', 'hydrophobic')
@@ -113,9 +116,10 @@ def createSQLResInfo (resNames, resOffset, protName):
 	return sqlInfo
 
 p2SQL = createSQLResInfo(p2_prot, 27, 'P2')
+p1SQL = createSQLResInfo(p1_prot, 1, 'P1')
 mSQL = createSQLResInfo(m_prot, 1, 'M')
 alpsSQL = createSQLResInfo(alps_prot, 1, 'ALPS')
-protSQL = p2SQL + mSQL + alpsSQL
+protSQL = p2SQL + p1SQL + mSQL + alpsSQL
 
 c.executemany(''' INSERT INTO Residues (aaKey, protein, resNum) VALUES (?,?,?)''', protSQL)
 
