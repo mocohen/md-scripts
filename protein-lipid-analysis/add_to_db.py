@@ -17,6 +17,7 @@ for opt, arg in opts:
     elif opt == '-r':
     	runNumber = arg
 
+print inFile, prot, membraneType, runNumber
 
 dateStringFormat = "%Y-%m-%d %H:%M:%S.000"
 
@@ -49,10 +50,11 @@ c.execute('''SELECT key FROM Systems where membraneType=? and protein=?
 key = c.fetchone()[0]
 
 residueDict = []
-for row in c.execute('SELECT key, resNum FROM Residues WHERE protein=? ORDER BY resNum', prot):
-	residueDict.append[row[0]]
+rows = c.execute('SELECT key, resNum FROM Residues WHERE protein=? ORDER BY resNum', (prot,))
+for row in rows:
+	residueDict.append(row[0])
 
-if(len(dict) < 1):
+if(len(residueDict) < 1):
 	raise NameError('The protein name you selected with -p is not in the database. Please chose a different protein')
 
 
@@ -62,7 +64,7 @@ for i in range(len(dat)):
 	#First get time at frame
 	timeFrame = dat[i][0] / 1000.0
 	timeVals[i] = timeFrame
-	print timeFrame	
+	#print timeFrame	
 	first = False
 	#check if first closer
 	if(-1.0*dat[i][3] < dat[i][6]):
