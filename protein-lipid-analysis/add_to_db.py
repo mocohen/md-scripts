@@ -50,8 +50,12 @@ c.execute('''SELECT key FROM Systems where membraneType=? and protein=?
 key = c.fetchone()[0]
 
 residueDict = []
+<<<<<<< Updated upstream
 rows = c.execute('SELECT key, resNum FROM Residues WHERE protein=? ORDER BY resNum', (prot,))
 for row in rows:
+=======
+for row in c.execute('SELECT key, resNum FROM Residues WHERE protein=? ORDER BY resNum', prot):
+>>>>>>> Stashed changes
 	residueDict.append(row[0])
 
 if(len(residueDict) < 1):
