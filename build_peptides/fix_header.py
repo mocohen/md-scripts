@@ -8,8 +8,8 @@ for opt, arg in opts:
     elif opt == '-o':
         outFile = arg
 
-output = open(inFile, "w")
-input = open(outFile, "r")
+output = open(outFile, "w")
+input = open(inFile, "r")
 r = []
 e = []
 
