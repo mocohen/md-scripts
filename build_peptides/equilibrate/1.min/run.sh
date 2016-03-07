@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=affa
-#SBATCH --partition=gavothgpu
+#SBATCH --partition=grotthuss
 #SBATCH --exclusive
 #SBATCH --gres=gpu:2
 #SBATCH --ntasks=12
@@ -23,4 +23,7 @@ mpirun -np 1 gmx_mpi grompp -f min.mdp -c ../../setup/solvate.pdb -p ../../setup
 
 
 mpirun -np $NPROC gmx_mpi mdrun -npme $NPME -v -deffnm min -gpu_id $GPU_ID 
+
+cd ../2.nvt
+sbatch run.sh
 

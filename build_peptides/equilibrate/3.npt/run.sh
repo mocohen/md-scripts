@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=affa
-#SBATCH --partition=gavothgpu
+#SBATCH --partition=grotthuss
 #SBATCH --exclusive
 #SBATCH --gres=gpu:2
 #SBATCH --ntasks=12

@@ -4,7 +4,7 @@ package require solvate
 
 
 
-topology ~/GITHUB/md-scripts/namd-to-gromacs/toppar/top_all36_prot.rtf
+topology /home/mocohen/GITHUB/md-scripts/namd-to-gromacs/toppar/top_all36_prot.rtf
 
 
 segment PROT {
