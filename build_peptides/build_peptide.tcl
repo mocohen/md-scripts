@@ -1,5 +1,5 @@
 package require psfgen
-packake require solvate 
+package require solvate 
 
 
 
