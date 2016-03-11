@@ -1,10 +1,10 @@
 package require psfgen
 set topDir "/Users/mocohen/GitHub/md-scripts/namd-to-gromacs/toppar/"
 
-topology /Users/mocohen/GitHub/md-scripts/namd-to-gromacs/toppar/top_all36_lipid.rtf
-topology /Users/mocohen/GitHub/md-scripts/namd-to-gromacs/toppar/top_all36_prot.rtf
-topology /Users/mocohen/GitHub/md-scripts/namd-to-gromacs/toppar/top_all36_carb.rtf
-topology /Users/mocohen/GitHub/md-scripts/namd-to-gromacs/toppar/toppar_all36_lipid_inositol.str
+topology "${topDir}top_all36_lipid.rtf"
+topology "${topDir}top_all36_prot.rtf"
+topology "${topDir}top_all36_carb.rtf"
+topology "${topDir}toppar_all36_lipid_inositol.str"
 topology "${topDir}top_water_ions.rtf"
 
 alias residue HIS HSE
