@@ -3,9 +3,15 @@
 module unload vmd
 module load vmd
 
+module unload gromacs
+module unload intel
+module unload intelmpi
+
+module load gromacs/5.0+intelmpi-5.0+intel-15.0
+
 vmd=vmd
 
-
+echo 1 1 | gmx_mpi trjconv -f ../equilibrate/3.npt/npt.gro -o prot.pdb -s ../equilibrate/3.npt/npt.tpr -pbc whole -center
 
 "$vmd" "-dispdev text -e ~/GITHUB/md-scripts/build_peptides/build_with_membrane/1.make_prot_lipid.tcl"
 "$vmd" "-dispdev text -e ~/GITHUB/md-scripts/build_peptides/build_with_membrane/2.create_psf.tcl"
