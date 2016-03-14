@@ -1,5 +1,5 @@
 package require psfgen
-set topDir "/Users/mocohen/GitHub/md-scripts/namd-to-gromacs/toppar/"
+set topDir "/home/mocohen/GITHUB/md-scripts/namd-to-gromacs/toppar/"
 
 topology "${topDir}top_all36_lipid.rtf"
 topology "${topDir}top_all36_prot.rtf"

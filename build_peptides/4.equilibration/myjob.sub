@@ -1,0 +1,89 @@
+#!/bin/csh
+#SBATCH --job-name=JOBNAME
+#SBATCH --partition=gavothgpu
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=24 
+#SBATCH --gres=gpu:4 
+#SBATCH --export=ALL  
+#SBATCH -t 24:00:00 
+
+module unload gromacs
+module unload intel
+module unload intelmpi
+module unload cuda
+
+
+module load cuda/5.0
+module load intel/15.0
+module load intelmpi/5.0+intel-15.0
+
+set GMX = /project/gavoth/mocohen/source/gromacs/gromacs-5.1.1/gromacs-build/bin/gmx_titan
+
+set NPROC = $SLURM_JOB_CPUS_PER_NODE
+set GPUID = 000111222333
+set NPME = 12
+
+
+# Minimization
+# In the case that there is a problem during minimization using a single precision of GROMACS, please try to use 
+# a double precision of GROMACS only for the minimization step.
+
+# step6.0
+mpirun -np 1 $GMX grompp -f step6.0_minimization.mdp -o step6.0_minimization.tpr -c ../3.build_with_membrane/final.ionized.pdb -p ../3.build_with_membrane/output/topol.top
+wait
+
+#$GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step6.0_minimization
+mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step6.0_minimization
+wait
+
+# Equilibration
+# step6.1
+mpirun -np 1 $GMX grompp -f step6.1_equilibration.mdp -o step6.1_equilibration.tpr -c step6.0_minimization.gro -r ../3.build_with_membrane/final.ionized.pdb -n ../3.build_with_membrane/output/index.ndx -p ../3.build_with_membrane/output/topol.top
+wait
+mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step6.1_equilibration
+wait
+# step6.2
+mpirun -np 1 $GMX grompp -f step6.2_equilibration.mdp -o step6.2_equilibration.tpr -c step6.1_equilibration.gro -r ../3.build_with_membrane/final.ionized.pdb -n ../3.build_with_membrane/output/index.ndx -p ../3.build_with_membrane/output/topol.top
+wait
+mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step6.2_equilibration
+wait
+# step6.3
+mpirun -np 1 $GMX grompp -f step6.3_equilibration.mdp -o step6.3_equilibration.tpr -c step6.2_equilibration.gro -r ../3.build_with_membrane/final.ionized.pdb -n ../3.build_with_membrane/output/index.ndx -p ../3.build_with_membrane/output/topol.top
+wait
+mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step6.3_equilibration
+wait
+# step6.4
+mpirun -np 1 $GMX grompp -f step6.4_equilibration.mdp -o step6.4_equilibration.tpr -c step6.3_equilibration.gro -r ../3.build_with_membrane/final.ionized.pdb -n ../3.build_with_membrane/output/index.ndx -p ../3.build_with_membrane/output/topol.top
+wait
+mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step6.4_equilibration
+wait
+# step6.5
+mpirun -np 1 $GMX grompp -f step6.5_equilibration.mdp -o step6.5_equilibration.tpr -c step6.4_equilibration.gro -r ../3.build_with_membrane/final.ionized.pdb -n ../3.build_with_membrane/output/index.ndx -p ../3.build_with_membrane/output/topol.top
+wait
+mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step6.5_equilibration
+wait
+# step6.6
+mpirun -np 1 $GMX grompp -f step6.6_equilibration.mdp -o step6.6_equilibration.tpr -c step6.5_equilibration.gro -r ../3.build_with_membrane/final.ionized.pdb -n ../3.build_with_membrane/output/index.ndx -p ../3.build_with_membrane/output/topol.top
+wait
+mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step6.6_equilibration
+wait
+# Production
+set cnt    = 1
+set cntmax = 10
+
+while ( ${cnt} <= ${cntmax} )
+	if ( ${cnt} == 1 ) then
+		mpirun -np 1 $GMX grompp -f step7_production.mdp -o step7_${cnt}.tpr -c step6.6_equilibration.gro -n ../3.build_with_membrane/output/index.ndx -p ../3.build_with_membrane/output/topol.top
+		wait
+		mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step7_${cnt}
+		wait
+	else
+		@ pcnt = ${cnt} - 1
+		$GMX convert-tpr -s step7_${pcnt}.tpr -f step7_${pcnt}.trr -e step7_${pcnt}.edr -o step7_${cnt}.tpr -extend 1000
+		wait
+		mpirun -np $NPROC $GMX mdrun -npme $NPME -dlb no -resethway -gpu_id $GPUID -v -deffnm step7_${cnt}
+		wait
+	endif
+	@ cnt += 1
+end
+

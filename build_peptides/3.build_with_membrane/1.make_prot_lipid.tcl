@@ -1,7 +1,7 @@
 #display resetview
 #mol addrep 0
 #display resetview
-mol new {membrane.pdb} type {pdb} first 0 last -1 step 1 waitfor 1
+mol new {/project/gavoth/mocohen/ccta/peptides/bilayer.pdbs/membrane.pdb} type {pdb} first 0 last -1 step 1 waitfor 1
 #animate style Loop
 #display resetview
 #mol addrep 1

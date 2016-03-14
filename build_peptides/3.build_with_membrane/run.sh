@@ -9,13 +9,15 @@ module unload intelmpi
 
 module load gromacs/5.0+intelmpi-5.0+intel-15.0
 
-vmd=vmd
+
 
 echo 1 1 | gmx_mpi trjconv -f ../equilibrate/3.npt/npt.gro -o prot.pdb -s ../equilibrate/3.npt/npt.tpr -pbc whole -center
 
-"$vmd" "-dispdev text -e ~/GITHUB/md-scripts/build_peptides/build_with_membrane/1.make_prot_lipid.tcl"
-"$vmd" "-dispdev text -e ~/GITHUB/md-scripts/build_peptides/build_with_membrane/2.create_psf.tcl"
-"$vmd" "-dispdev text -e ~/GITHUB/md-scripts/build_peptides/build_with_membrane/3.solvate.ionize.tcl"
+wait
+
+vmd -dispdev text -e ~/GITHUB/md-scripts/build_peptides/build_with_membrane/1.make_prot_lipid.tcl
+vmd -dispdev text -e ~/GITHUB/md-scripts/build_peptides/build_with_membrane/2.create_psf.tcl
+vmd -dispdev text -e ~/GITHUB/md-scripts/build_peptides/build_with_membrane/3.solvate.ionize.tcl
 
 python ~/GITHUB/md-scripts/build_peptides/build_with_membrane/4.fix_header.py
 python ~/GITHUB/md-scripts/namd-to-gromacs/psf2itp.py ~/GITHUB/md-scripts/namd-to-gromacs/toppar final.ionized.psf 
