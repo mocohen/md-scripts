@@ -1,6 +1,6 @@
 #!/bin/bash
 
-vmd=/Users/mocohen/Work/source/VMD\ 1.9.2.app/Contents/MacOS/startup.command
+vmd=/Users/mocohen/Work/source/VMD.1.9.2.app/Contents/MacOS/startup.command
 
 "$vmd" "-dispdev text -e ~/GitHub/md-scripts/build_prot_lipids/1.make_prot_lipid.tcl"
 "$vmd" "-dispdev text -e ~/GitHub/md-scripts/build_prot_lipids/2.create_psf.tcl"
