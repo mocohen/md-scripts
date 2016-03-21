@@ -1,0 +1,108 @@
+GROMACS COMMANDS TO SOLVATE AND GET A SYSTEM RUNNING
+
+Current GMX file --> gmx_mpi_d
+
+1) Convert pdb to gmx
+
+gmx_mpi_d pdb2gmx -f h0.pdb -o h0.gro -water tip3p
+
+-f --> pdb file
+-o --> output file
+-water --> water type (spce, tip3p, etc.)
+
+You will be able to choose a ff interactively
+Add ff to list by having .ff files in current directory
+
+
+2) Solvation
+
+* First create periodic box
+
+gmx_mpi_d editconf -f h0.gro -o h0_newbox.gro -c -d 1.2 -bt cubic
+
+-f --> pdb file
+-o --> output file
+-c --> add protein at center
+-d --> place protein at least this distance (nm) from box edge
+-bt --> box type 
+
+* Add Waters
+
+gmx_mpi_d solvate -cp h0_newbox.gro -cs spc216.gro -o h0_solv.gro -p topol.top
+
+-cp --> protein configuration, i.e. protein input file
+-cs --> solvent configuration. spc216.gro works for any 3 site water model
+-p --> topology file
+
+3) Ionize
+
+* ions will be added with energy minimizaion
+* Generate input file with gromacs pre-processor (grompp)
+
+gmx_mpi_d grompp -f ions.mdp -c h0_solv.gro -p topol.top -o ionize.tpr
+
+-f --> minimization script (md parameter file)
+-c --> gromacs structure file
+-p --> topology file
+-o --> input file created by grompp
+
+gmx_mpi_d genion -s ionize.tpr -o h0_ions_solv.gro -p topol.top -pname NA -nname CL -conc .150 -neutral
+
+You will need to choose what molecules the ions are replacing interactively
+
+-s --> input file
+-o --> output structure file
+-p --> topology file
+-pname --> positive ion name
+-nname --> negative ion name
+-conc --> concentration in Molar of salt to be added
+-neutral --> Also make sure it is neutral
+
+4) Minimization
+
+gmx_mpi_d grompp -f min.mdp -c h0_ions_solv.gro -p topol.top -o min.tpr
+
+-f --> md parameter file 
+-c --> gromacs structure file
+-p --> topology file
+-o --> generated input file for md run 
+
+gmx_mpi_d mdrun [-v] -deffnm min [-s min.tpr]
+
+-v --> verbose, output information while running
+-deffnm --> default file name for all file options
+-s --> input file, does not need to be specified if file name is same as default
+
+check energy using energy module
+
+gmx_mpi_d energy -f min.edr -o energy.xvg
+
+-f --> energy file to be read
+-o --> output file (as xvg, for xmgrace)
+
+
+5) Equilibration (NVT or NPT)
+
+gmx_mpi_d grompp -f nvt.mdp -c min.gro -p topol.top -o nvt.tpr
+
+-f --> md parameter file
+-c --> gromacs structure file 
+-p --> topology file
+-o generated input file for md run
+
+gmx_mpi_d mdrun -deffnm nvt
+
+-deffnm --> default file name for all file options
+
+6) MD Continuation
+
+gmx_mpi_d grompp -f npt.mdp -c nvt.gro -t nvt.cpt -p topol.top -o npt.tpr
+
+-f --> md parameter file
+-c --> gromacs structure file 
+-t --> input coordinates, from  checkpoint 
+-p --> topology file
+-o generated input file for md run
+
+
+
