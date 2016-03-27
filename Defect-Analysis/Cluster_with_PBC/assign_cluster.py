@@ -5,12 +5,14 @@ from datetime import datetime, tzinfo
 #import matplotlib.dates as mdates
 import numpy as np
 
-opts, args = getopt.getopt(sys.argv[1:], "i:o:")
+opts, args = getopt.getopt(sys.argv[1:], "i:o:p:")
 for opt, arg in opts:
     if opt == '-i':
         inFile = arg
     elif opt == '-o':
         outDir = arg
+    elif opt == '-p':
+    	pbcFile = arg
         
 
 cutoff = 2.5
@@ -38,10 +40,7 @@ prevBotClustersNum = 0
 count = 0
 frame = 0
 
-minX = -100
-minY = -100
-maxX = 100
-maxY = 100
+
 
 top_defects = np.zeros(1)
 bot_defects = np.zeros(1)
@@ -57,6 +56,25 @@ lastBot = np.zeros(1)
 output_top_tracking = open(outDir + 'TOP-TRACKING.dat', "w")
 output_bot_tracking = open(outDir + 'BOTTOM-TRACKING.dat', "w")
 
+
+########### READ IN PBC FILE
+pbcInfo = np.loadtxt(pbcFile, comments=('#', '@')).T
+
+maxA = np.amax(pbcInfo[1])
+maxB = np.amax(pbcInfo[2])
+
+dt = 5
+pbcX = 0.0
+pbcY = 0.0
+
+minX = -10.0 * maxA / 2.0
+minY = -10.0 * maxB / 2.0
+maxX =  10.0 * maxA / 2.0
+maxY =  10.0 * maxB / 2.0
+
+
+output_top.write(" #Cluster     #     xPos     yPos     size     xmin     xmax     ymin     ymax\n" )
+output_bot.write(" #Cluster     #     xPos     yPos     size     xmin     xmax     ymin     ymax\n" )
 
 print 'beginning clustering'
 #outTemp = open('test.dat', "w")
@@ -74,10 +92,15 @@ for line in input:
 		bot_defects = np.zeros((total_bot_points, 2))
 		count = 0
 	elif (len(split_line) == 2):
-		frame = split_line[1]
+		frame = int(split_line[1])
+		index = (frame - 1)*dt
 		#print 'frame', frame
-		output_top.write("frame: %s\n" % frame)
-		output_bot.write("frame: %s\n" % frame)	
+		output_top.write("frame: %6d time: %.3f ns\n" % (frame, pbcInfo[0][index] / 1000.0))
+		output_bot.write("frame: %6d time: %.3f ns\n" % (frame, pbcInfo[0][index] / 1000.0))	
+
+		pbcX = pbcInfo[1][index]*10.0
+		pbcY = pbcInfo[2][index]*10.0
+
 	else:
 		count += 1
 		if(split_line[0] == 'T'):
@@ -104,18 +127,22 @@ for line in input:
 			dist_matrix = np.zeros((total_top_points, total_top_points))
 			#print adj_matrix
 			# evaluate all distances
+
 			for i in range(total_top_points):
 				for j in range(i+1, total_top_points):
-					dist = 	np.sqrt( np.square(top_defects[i][0] - top_defects[j][0]) +  np.square(top_defects[i][1] - top_defects[j][1]))
+					dx = (top_defects[i][0] - top_defects[j][0]) - pbcX*np.round((top_defects[i][0] - top_defects[j][0]) / pbcX)
+					dy = (top_defects[i][1] - top_defects[j][1]) - pbcY*np.round((top_defects[i][1] - top_defects[j][1]) / pbcY)
+					dist = 	np.sqrt( np.square(dx) +  np.square(dy))
 					dist_matrix[i][j] = dist
 					if dist < cutoff:
 						adj_matrix[i][j] = True
 						adj_matrix[j][i] = True
+
 			###########################
 			
 			
 						
-			print "assigning clusters in top \nframe", frame
+			print 'frame ', frame, "\nassigning clusters in top "
 			
 			k = 0
 			points_left = total_top_points
@@ -207,9 +234,9 @@ for line in input:
 				while not pointsInCluster.empty():
 					curr = pointsInCluster.get()
 					defect = top_defects[curr]
+					#print defect[0], defect[1]
 					xDefectVals[i] = defect[0]
 					yDefectVals[i] = defect[1]
-					
 					
 					indexX = int( (defect[0] - minX)/ grid_size)
 					indexY = int((defect[1] - minY) / grid_size)
@@ -224,7 +251,9 @@ for line in input:
 						raise NameError('Point has already been added to this location. Consider increasing your grid_size')
 					
 					i += 1
-				output_top.write("Cluster %d %.3f %.3f %.3f\n" % (k, np.mean(xDefectVals), np.mean(yDefectVals), numBins * np.square(grid_size)))
+				output_top.write("Cluster %2d %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n" % 
+						(k, np.mean(xDefectVals), np.mean(yDefectVals), numBins * np.square(grid_size), 
+							np.amin(xDefectVals), np.amax(xDefectVals) + grid_size, np.amin(yDefectVals), np.amax(yDefectVals) + grid_size))
 				
 			########################################################################
 
@@ -243,8 +272,9 @@ for line in input:
 			# evaluate all distances
 			for i in range(total_bot_points):
 				for j in range(i+1, total_bot_points):
-					dist = 	np.sqrt( np.square(bot_defects[i][0] - bot_defects[j][0]) +  np.square(bot_defects[i][1] - bot_defects[j][1]))
-					dist_matrix[i][j] = dist
+					dx = (bot_defects[i][0] - bot_defects[j][0]) - pbcX*np.round((bot_defects[i][0] - bot_defects[j][0]) / pbcX)
+					dy = (bot_defects[i][1] - bot_defects[j][1]) - pbcY*np.round((bot_defects[i][1] - bot_defects[j][1]) / pbcY)
+					dist = 	np.sqrt( np.square(dx) +  np.square(dy))
 					if dist < cutoff:
 						adj_matrix[i][j] = True
 						adj_matrix[j][i] = True
@@ -252,7 +282,7 @@ for line in input:
 			
 			
 						
-			print "assigning clusters in bottom \nframe", frame
+			print "assigning clusters in bottom \n",
 			
 			k = 0
 			points_left = total_bot_points
@@ -361,7 +391,9 @@ for line in input:
 						raise NameError('Point has already been added to this location. Consider increasing your grid_size')
 					
 					i += 1
-				output_bot.write("Cluster %d %.3f %.3f %.3f\n" % (k, np.mean(xDefectVals), np.mean(yDefectVals), numBins * np.square(grid_size)))
+				output_bot.write("Cluster %2d %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n" % 
+						(k, np.mean(xDefectVals), np.mean(yDefectVals), numBins * np.square(grid_size), 
+							np.amin(xDefectVals), np.amax(xDefectVals) + grid_size, np.amin(yDefectVals), np.amax(yDefectVals) + grid_size))
 				
 				########################################################################
 			
