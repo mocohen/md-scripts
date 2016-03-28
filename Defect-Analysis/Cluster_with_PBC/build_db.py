@@ -32,7 +32,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS DEFECT_CLUSTERS( 	Id INTEGER PRIMARY KEY
 											Y_max REAL, 
 											Size REAL,
                                             systemID INT)''')
-c.execute('''CREATE TABLE DEFECT_MATCHES( 	Id INTEGER PRIMARY KEY AUTOINCREMENT, 
+c.execute('''CREATE TABLE IF NOT EXISTS DEFECT_MATCHES( 	Id INTEGER PRIMARY KEY AUTOINCREMENT, 
 											Prev_id INT, 
 											Curr_id INT)''')
 
