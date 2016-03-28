@@ -9,16 +9,16 @@ for opt, arg in opts:
     elif opt == '-j':
         defectDescriptionFile = arg
     elif opt == '-o':
-        outFile = arg
+        dbFile = arg
     elif opt == '-p':
         prot = arg
     elif opt == '-m':
         membraneType = arg
     elif opt == '-r':
         runNumber = arg
-        
+
 # OPEN DB CONNECTION
-conn = sqlite3.connect(outFile)
+conn = sqlite3.connect(dbFile)
 c = conn.cursor()
 # CREATE TABLES
 c.execute('''CREATE TABLE IF NOT EXISTS DEFECT_CLUSTERS( 	Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,7 +78,7 @@ for line in defectInput:
         #print 'index %d size %f' % (clusterIndex, size)
         #allDefects.append([clusterIndex ,currentFrame, x, y, size])
         c.execute('INSERT INTO DEFECT_CLUSTERS (Defect_Frame_id, timestep, X_pos, Y_pos, X_min, X_max, Y_min, Y_max, Size, systemID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-    		[clusterIndex , timestep, x, y, xmin, xmax, ymin, ymax, size, key])
+    		[clusterIndex , currentTime, x, y, xmin, xmax, ymin, ymax, size, key])
         # store defect in defects dictionary for later reference
         defects[(currentFrame, clusterIndex)] = c.lastrowid
 
