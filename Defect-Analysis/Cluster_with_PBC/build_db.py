@@ -2,7 +2,7 @@ import sys, getopt, os, errno, re, string
 import numpy as np
 import sqlite3
 
-opts, args = getopt.getopt(sys.argv[1:], "i:j:o:")
+opts, args = getopt.getopt(sys.argv[1:], "i:j:o:p:m:r:")
 for opt, arg in opts:
     if opt == '-i':
         inFile = arg
@@ -10,7 +10,13 @@ for opt, arg in opts:
         defectDescriptionFile = arg
     elif opt == '-o':
         outFile = arg
-
+    elif opt == '-p':
+        prot = arg
+    elif opt == '-m':
+        membraneType = arg
+    elif opt == '-r':
+        runNumber = arg
+        
 # OPEN DB CONNECTION
 conn = sqlite3.connect(outFile)
 c = conn.cursor()
@@ -24,7 +30,8 @@ c.execute('''CREATE TABLE IF NOT EXISTS DEFECT_CLUSTERS( 	Id INTEGER PRIMARY KEY
 											Y_pos REAL,
 											Y_min REAL,
 											Y_max REAL, 
-											Size REAL)''')
+											Size REAL,
+                                            systemID INT)''')
 c.execute('''CREATE TABLE DEFECT_MATCHES( 	Id INTEGER PRIMARY KEY AUTOINCREMENT, 
 											Prev_id INT, 
 											Curr_id INT)''')
@@ -39,7 +46,11 @@ if not defectDescriptionFile:
 defectInput = open(defectDescriptionFile, 'r')
 
 
+c.execute('''SELECT key FROM Systems where membraneType=? and protein=?
+                         and runNumber=?''', (membraneType,  prot, runNumber))
 
+
+key = c.fetchone()[0]
 
 			
 
@@ -66,8 +77,8 @@ for line in defectInput:
         ymax = float(splitLine[8])
         #print 'index %d size %f' % (clusterIndex, size)
         #allDefects.append([clusterIndex ,currentFrame, x, y, size])
-        c.execute('INSERT INTO DEFECT_CLUSTERS (Defect_Frame_id, timestep, X_pos, Y_pos, X_min, X_max, Y_min, Y_max, Size) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-    		[clusterIndex , timestep, x, y, xmin, xmax, ymin, ymax, size])
+        c.execute('INSERT INTO DEFECT_CLUSTERS (Defect_Frame_id, timestep, X_pos, Y_pos, X_min, X_max, Y_min, Y_max, Size, systemID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+    		[clusterIndex , timestep, x, y, xmin, xmax, ymin, ymax, size, key])
         # store defect in defects dictionary for later reference
         defects[(currentFrame, clusterIndex)] = c.lastrowid
 
