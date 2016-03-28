@@ -95,11 +95,12 @@ for line in input:
 		frame = int(split_line[1])
 		index = (frame - 1)*dt
 		#print 'frame', frame
-		output_top.write("frame: %6d time: %.3f ns\n" % (frame, pbcInfo[0][index] / 1000.0))
-		output_bot.write("frame: %6d time: %.3f ns\n" % (frame, pbcInfo[0][index] / 1000.0))	
-
 		pbcX = pbcInfo[1][index]*10.0
 		pbcY = pbcInfo[2][index]*10.0
+		output_top.write("frame: %6d time: %.3f ns pbcX: %6.2f  pbcY: %6.2f\n" % (frame, pbcInfo[0][index] / 1000.0, pbcX, pbcY))
+		output_bot.write("frame: %6d time: %.3f ns pbcX: %6.2f  pbcY: %6.2f\n" % (frame, pbcInfo[0][index] / 1000.0, pbcX, pbcY))
+
+
 
 	else:
 		count += 1
@@ -251,9 +252,21 @@ for line in input:
 						raise NameError('Point has already been added to this location. Consider increasing your grid_size')
 					
 					i += 1
+				if (np.amin(xDefectVals)- np.amax(xDefectVals)) > pbcX / 2.0:
+					for val in xDefectVals:
+						if val < 0:
+							val += pbcX
+				if (np.amin(yDefectVals)- np.amax(yDefectVals)) > pbcY / 2.0:
+					for val in yDefectVals:
+						if val < 0:
+							val += pbcY						
+				xMinDef = np.amin(xDefectVals)
+				xMaxDef = np.amax(xDefectVals)
+				yMinDef = np.amin(yDefectVals)
+				yMaxDef = np.amax(yDefectVals)  
 				output_top.write("Cluster %2d %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n" % 
 						(k, np.mean(xDefectVals), np.mean(yDefectVals), numBins * np.square(grid_size), 
-							np.amin(xDefectVals), np.amax(xDefectVals) + grid_size, np.amin(yDefectVals), np.amax(yDefectVals) + grid_size))
+							xMinDef, xMaxDef + grid_size, yMinDef, yMaxDef + grid_size))
 				
 			########################################################################
 
@@ -391,9 +404,21 @@ for line in input:
 						raise NameError('Point has already been added to this location. Consider increasing your grid_size')
 					
 					i += 1
-				output_bot.write("Cluster %2d %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n" % 
+				if (np.amin(xDefectVals)- np.amax(xDefectVals)) > pbcX / 2.0:
+					for val in xDefectVals:
+						if val < 0:
+							val += pbcX
+				if (np.amin(yDefectVals)- np.amax(yDefectVals)) > pbcY / 2.0:
+					for val in yDefectVals:
+						if val < 0:
+							val += pbcY						
+				xMinDef = np.amin(xDefectVals)
+				xMaxDef = np.amax(xDefectVals)
+				yMinDef = np.amin(yDefectVals)
+				yMaxDef = np.amax(yDefectVals)  
+				output_top.write("Cluster %2d %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n" % 
 						(k, np.mean(xDefectVals), np.mean(yDefectVals), numBins * np.square(grid_size), 
-							np.amin(xDefectVals), np.amax(xDefectVals) + grid_size, np.amin(yDefectVals), np.amax(yDefectVals) + grid_size))
+							xMinDef, xMaxDef + grid_size, yMinDef, yMaxDef + grid_size))
 				
 				########################################################################
 			
