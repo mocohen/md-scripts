@@ -252,14 +252,14 @@ for line in input:
 						raise NameError('Point has already been added to this location. Consider increasing your grid_size')
 					
 					i += 1
-				if (np.amin(xDefectVals)- np.amax(xDefectVals)) > pbcX / 2.0:
-					for val in xDefectVals:
-						if val < 0:
-							val += pbcX
-				if (np.amin(yDefectVals)- np.amax(yDefectVals)) > pbcY / 2.0:
-					for val in yDefectVals:
-						if val < 0:
-							val += pbcY						
+				if (np.amax(xDefectVals)- np.amin(xDefectVals)) > pbcX / 2.0:
+					for ind in range(len(xDefectVals)):
+						if xDefectVals[ind] < 0:
+							xDefectVals[ind] += pbcX
+				if (np.amax(yDefectVals)- np.amin(yDefectVals)) > pbcY / 2.0:
+					for ind in range(len(yDefectVals)):
+						if yDefectVals[ind] < 0:
+							yDefectVals[ind] += pbcY					
 				xMinDef = np.amin(xDefectVals)
 				xMaxDef = np.amax(xDefectVals)
 				yMinDef = np.amin(yDefectVals)
@@ -404,19 +404,19 @@ for line in input:
 						raise NameError('Point has already been added to this location. Consider increasing your grid_size')
 					
 					i += 1
-				if (np.amin(xDefectVals)- np.amax(xDefectVals)) > pbcX / 2.0:
-					for val in xDefectVals:
-						if val < 0:
-							val += pbcX
-				if (np.amin(yDefectVals)- np.amax(yDefectVals)) > pbcY / 2.0:
-					for val in yDefectVals:
-						if val < 0:
-							val += pbcY						
+				if (np.amax(xDefectVals)- np.amin(xDefectVals)) > pbcX / 2.0:
+					for ind in range(len(xDefectVals)):
+						if xDefectVals[ind] < 0:
+							xDefectVals[ind] += pbcX
+				if (np.amax(yDefectVals)- np.amin(yDefectVals)) > pbcY / 2.0:
+					for ind in range(len(yDefectVals)):
+						if yDefectVals[ind] < 0:
+							yDefectVals[ind] += pbcY						
 				xMinDef = np.amin(xDefectVals)
 				xMaxDef = np.amax(xDefectVals)
 				yMinDef = np.amin(yDefectVals)
 				yMaxDef = np.amax(yDefectVals)  
-				output_top.write("Cluster %2d %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n" % 
+				output_bot.write("Cluster %2d %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f\n" % 
 						(k, np.mean(xDefectVals), np.mean(yDefectVals), numBins * np.square(grid_size), 
 							xMinDef, xMaxDef + grid_size, yMinDef, yMaxDef + grid_size))
 				
