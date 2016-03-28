@@ -2,7 +2,7 @@ import sys, getopt, os, errno, re, string
 import numpy as np
 import sqlite3
 
-opts, args = getopt.getopt(sys.argv[1:], "i:j:o:p:m:r:")
+opts, args = getopt.getopt(sys.argv[1:], "i:j:o:p:m:r:s:")
 for opt, arg in opts:
     if opt == '-i':
         inFile = arg
@@ -16,6 +16,10 @@ for opt, arg in opts:
         membraneType = arg
     elif opt == '-r':
         runNumber = arg
+    elif opt == '-s':
+        zpos = int(arg)
+        # -1 : bottom
+        # +1 : top
 
 # OPEN DB CONNECTION
 conn = sqlite3.connect(dbFile)
@@ -29,7 +33,8 @@ c.execute('''CREATE TABLE IF NOT EXISTS DEFECT_CLUSTERS( 	Id INTEGER PRIMARY KEY
 											X_max REAL, 
 											Y_pos REAL,
 											Y_min REAL,
-											Y_max REAL, 
+											Y_max REAL,
+                                            Z_pos INT, 
 											Size REAL,
                                             systemID INT)''')
 c.execute('''CREATE TABLE IF NOT EXISTS DEFECT_MATCHES( 	Id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -77,8 +82,8 @@ for line in defectInput:
         ymax = float(splitLine[8])
         #print 'index %d size %f' % (clusterIndex, size)
         #allDefects.append([clusterIndex ,currentFrame, x, y, size])
-        c.execute('INSERT INTO DEFECT_CLUSTERS (Defect_Frame_id, timestep, X_pos, Y_pos, X_min, X_max, Y_min, Y_max, Size, systemID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-    		[clusterIndex , currentTime, x, y, xmin, xmax, ymin, ymax, size, key])
+        c.execute('INSERT INTO DEFECT_CLUSTERS (Defect_Frame_id, timestep, X_pos, Y_pos, X_min, X_max, Y_min, Y_max, Z_pos, Size, systemID) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+    		[clusterIndex , currentTime, x, y, xmin, xmax, ymin, ymax, zpos, size, key])
         # store defect in defects dictionary for later reference
         defects[(currentFrame, clusterIndex)] = c.lastrowid
 
