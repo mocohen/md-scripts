@@ -19,7 +19,7 @@ module unload intelmpi
 
 module load gromacs/5.0-cuda+intelmpi-5.0+intel-15.0
 
-mpirun -np 1 gmx_mpi grompp -f nvt.mdp -c ../1.min/min.gro -p ../../setup/output/topol.top -o nvt.tpr
+mpirun -np 1 gmx_mpi grompp -f nvt.mdp -c ../1.min/min.gro -p ../../1.setup/output/topol.top -o nvt.tpr
 
 
 mpirun -np $NPROC gmx_mpi mdrun -npme $NPME -v -deffnm nvt -gpu_id $GPU_ID 
