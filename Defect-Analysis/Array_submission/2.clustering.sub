@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#SBATCH --job-name=clustering
+#SBATCH --output=output_clustering/defects.small_%A_%a.out
+#SBATCH --array=0-499
+#SBATCH --time=1:00:00
+#SBATCH --ntasks=1
+#SBATCH --partition=gavoth-sdb
+#SBATCH --qos=gavoth
+
+######################
+# Begin work section #
+######################
+
+# Print this sub-job's task ID
+echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_TASK_ID
+#MYSHIFT=$((SLURM_ARRAY_TASK_ID*100))
+#echo "Myshift " $MYSHIFT
+module load python
+python ./assign_cluster.py -i ../step$SLURM_ARRAY_TASK_ID/topAndBottom.xyz -o ../step$SLURM_ARRAY_TASK_ID/ -p box.dim.xvg 
+

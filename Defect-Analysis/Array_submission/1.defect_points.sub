@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#SBATCH --job-name=defects.small
+#SBATCH --output=output/defects.small_%A_%a.out
+
+#SBATCH --array=2-499
+#SBATCH --time=24:00:00
+#SBATCH --ntasks=1
+#SBATCH --partition=gavoth-ivb
+#SBATCH --qos=gavoth
+# #SBATCH -p gavothgpu
+# #SBATCH --reservation=gavothgpu-mocohen
+#SBATCH --mem-per-cpu=8000
+
+######################
+# Begin work section #
+######################
+
+# Print this sub-job's task ID
+echo "My SLURM_ARRAY_TASK_ID: " $SLURM_ARRAY_TASK_ID
+
+#cp -r template step$SLURM_ARRAY_TASK_ID
+mkdir ../step$SLURM_ARRAY_TASK_ID
+#cd step$SLURM_ARRAY_TASK_ID
+
+module load vmd/1.9.1
+
+vmd -dispdev text -e defect-map-popc-sapi-dope.tcl -args  run.gro ../../3.run/split_trajectories/run.unwrapped$SLURM_ARRAY_TASK_ID.xtc ../step$SLURM_ARRAY_TASK_ID/ $SLURM_ARRAY_TASK_ID
+
+
+# Do some work based on the SLURM_ARRAY_TASK_ID
+# For example: 
+# ./my_process $SLURM_ARRAY_TASK_ID
+# 
+# where my_process is you executable
