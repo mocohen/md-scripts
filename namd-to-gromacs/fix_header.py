@@ -1,11 +1,14 @@
-import sys, getopt, os, errno, re, string, math
-#import matplotlib.cm as cm
+import sys, getopt, os
 
 opts, args = getopt.getopt(sys.argv[1:], "i:o:")
+for opt, arg in opts:
+    if opt == '-i':
+        inFile = arg
+    elif opt == '-o':
+        outFile = arg
 
-
-output = open('final.ionized.psf', "w")
-input = open('new.ionized.psf', "r")
+output = open(inFile, "w")
+input = open(outFile, "r")
 r = []
 e = []
 
