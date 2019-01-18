@@ -1,3 +1,10 @@
+
+''' Script for clustering lipid packing defects 
+- based on previous calculation of solvent accesible surface area, decomposed into points
+- clusters individual points into larger packing defects
+- places points on grid for later lifetime analysis
+'''
+
 import sys, getopt, os, errno, re, string
 import Queue
 from datetime import datetime, tzinfo
